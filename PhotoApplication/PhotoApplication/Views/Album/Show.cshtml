@@ -1,0 +1,29 @@
+﻿@model PhotoApplication.Models.Album
+
+@{
+    ViewBag.Title = "Show";
+}
+
+<h1>Model.AlbumName</h1>
+
+
+<div class="panel panel-default">
+    @Html.Partial("ArticleInfo", Model)
+
+    @if (Model.UserId == ViewBag.currentUser|| ViewBag.isAdmin)
+    {
+
+    <div class="panel-footer article-panel-footer">
+        <a class="btn btn-primary" href="/Album/Edit/@Model.Id">Edit album</a>
+        @if (Model.UserId == ViewBag.currentUser || ViewBag.isAdmin)
+        { 
+            using (Html.BeginForm(actionName: "Delete", controllerName: "Album", method: FormMethod.Post, routeValues: new { id = @Model.Id }))
+            {
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button class="btn btn-danger" type="submit">Delete album</button>
+            }
+        }
+    </div>
+    }
+</div>

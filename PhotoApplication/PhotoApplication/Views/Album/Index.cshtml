@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "Albums";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<hr />
+
+@if (TempData.ContainsKey("message"))
+{
+    <h3 class="alert alert-info" role="alert">@ViewBag.message</h3>
+}
+
+@foreach (PhotoApplication.Models.Album album in ViewBag.Albums)
+{
+    <div class="panel panel-article">
+        @Html.Partial("AlbumInfo", album)
+        <div class="panel-footer article-panel-footer around">
+            <a class="btn btn-sm btn-success full-width" href="/Album/Show/@album.Id">Afisare articol</a>
+        </div>
+    </div>
+    <br />
+}
+
+
+<div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li>
+                <a href="/Album/Index?page=1" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 1; i <= ViewBag.lastPage; i++)
+            {
+                <li><a href="/Album/Index?page=@i">@(i)</a></li>
+            }
+            <li>
+                <a href="/Album/Index?page=@(ViewBag.lastPage)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+

@@ -1,0 +1,37 @@
+﻿@model PhotoApplication.Models.ApplicationUser
+@{
+    ViewBag.Title = "Afisare utilizator";
+}
+
+<ol class="breadcrumb">
+    <li><h3>@ViewBag.Title</h3></li>
+</ol>
+
+<div class="panel-heading">Nume utilizator : @Model.UserName</div>
+
+<div class="panel-body">
+    <i class="glyphicon glyphicon-envelope"></i>
+    Email utilizator : <span class="label label-default">@Model.Email</span>
+
+    <i class="glyphicon glyphicon-envelope"></i>
+    Rol utilizator : <span class="label label-default">@ViewBag.userRole</span>
+
+    <br /><br />
+
+    @if (@Model.PhoneNumber != null)
+    {
+        <i class="glyphicon glyphicon-phone"></i>
+        @:Telefon utilizator: <span class="label label-default">@Model.PhoneNumber</span>
+    }
+
+</div>
+
+@using (Html.BeginForm(actionName: "Delete", controllerName: "Users", routeValues: new { id = @Model.Id }))
+{ 
+    @Html.HttpMethodOverride(HttpVerbs.Delete)
+    <div class="panel-footer">
+        <button class="btn btn-sm btn-success" type="submit">
+            Stergere utilizator
+        </button>    
+    </div>
+}
