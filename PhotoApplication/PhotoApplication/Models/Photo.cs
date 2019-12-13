@@ -18,12 +18,15 @@ namespace PhotoApplication.Models
 
         [DataType(DataType.DateTime, ErrorMessage = "The field must contain date and time")]
         public DateTime Date { get; set; }
-
+        
         [Required(ErrorMessage = "You must upload a picture!")]
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
 
         [Required(ErrorMessage = "You must choose a category!")]
         public int CategoryId { get; set; }
+
+        [Required(ErrorMessage = "You must choose an album!")]
+        public int AlbumId { get; set; }
 
         public string UserId { get; set; }
 

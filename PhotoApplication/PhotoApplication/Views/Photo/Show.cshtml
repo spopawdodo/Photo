@@ -1,0 +1,39 @@
+﻿@model PhotoApplication.Models.Photo
+
+@{
+    ViewBag.Title = "Show";
+}
+
+@{
+    string imageBase64 = Convert.ToBase64String(Model.Image);
+    string imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+}
+
+<h1>Show photo</h1>
+
+
+<div class="panel panel-default">
+    <img src="@imageSrc" alt="Model.Title" wight ="30%">
+
+    @if (ViewBag.displayButtons == true && Model.UserId == ViewBag.currentUser
+        || ViewBag.isAdmin)
+    {
+
+        <div class="panel-footer article-panel-footer">
+            <a class="btn btn-primary" href="/Photo/Edit/@Model.Id">Edit photo</a>
+
+            @if (ViewBag.displayButtons == true && Model.UserId == ViewBag.currentUser
+            || ViewBag.isAdmin)
+            {
+
+                using (Html.BeginForm(actionName: "Delete", controllerName: "Photo", method: FormMethod.Post, routeValues: new { id = @Model.Id }))
+                {
+
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button class="btn btn-danger" type="submit">Delete Photo</button>
+
+                }
+            }
+        </div>
+    }
+</div>

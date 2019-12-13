@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
 using PhotoApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 
 namespace PhotoApplication.Controllers
@@ -36,7 +38,7 @@ namespace PhotoApplication.Controllers
             ViewBag.perPage = this._perPage;
             ViewBag.total = totalItems;
             ViewBag.lastPage = Math.Ceiling((float)totalItems / (float)this._perPage);
-            ViewBag.Articles = paginatedPhotos;
+            ViewBag.Photos = paginatedPhotos;
 
             return View();
         }
@@ -45,6 +47,8 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Photo photo = db.Photos.Find(id);
+            WebImage image = new WebImage(photo.Image);
+            File(image.GetBytes(), "image/" + image.ImageFormat, image.FileName);
 
             ViewBag.displayButtons = false;
             if (photo.UserId == User.Identity.GetUserId() || User.IsInRole("Administrator"))
@@ -52,6 +56,7 @@ namespace PhotoApplication.Controllers
                 ViewBag.displayButtons = true;
             }
 
+            ViewBag.image = image;
             ViewBag.isAdmin = User.IsInRole("Administrator");
             ViewBag.currentUser = User.Identity.GetUserId();
 
@@ -66,6 +71,7 @@ namespace PhotoApplication.Controllers
             Photo photo = new Photo();
 
             photo.Categories = GetAllCategories();
+            photo.Albums = GetUserAlbums();
 
             // get the current users's id
             photo.UserId = User.Identity.GetUserId();
@@ -80,30 +86,38 @@ namespace PhotoApplication.Controllers
         public ActionResult New(Photo photo)
         {
             photo.Categories = GetAllCategories();
+            photo.Albums = GetUserAlbums();
+
+            HttpPostedFile postedFile = Request.Files["ImageFile"];
+
             try
             {
                 if (ModelState.IsValid)
                 {
-                    // Protect content from XSS
-                    article.Content = Sanitizer.GetSafeHtmlFragment(article.Content);
-                    db.Articles.Add(article);
+                    if (photo.Image != null)
+                    {
+                        //photo.Image.SaveAs(HttpContext.Server.MapPath("~/Images/") + file.FileName);
+                        //car.ImagePath = file.FileName;
+                    }
+                    //photo.Image = imageToByte;
+                    db.Photos.Add(photo);
                     db.SaveChanges();
-                    TempData["message"] = "Articolul a fost adaugat!";
+                    TempData["message"] = "Photo was added";
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    return View(article);
+                    return View(photo);
                 }
             }
             catch (Exception e)
             {
-                return View(article);
+                return View(photo);
             }
         }
 
         [NonAction]
-        public IEnumerable<SelectListItem> GetAllCategories()
+        private IEnumerable<SelectListItem> GetAllCategories()
         {
             // generam o lista goala
             var selectList = new List<SelectListItem>();
@@ -125,6 +139,31 @@ namespace PhotoApplication.Controllers
 
             // returnam lista de categorii
             return selectList;
+        }
+
+        [NonAction]
+        private IEnumerable<SelectListItem> GetUserAlbums()
+        {
+            var selectLIst = new List<SelectListItem>();
+
+            //get all user's albums
+
+            var user = User.Identity.GetUserId();
+            var albums = from al in db.Albums
+                         where al.UserId == user
+                         select al;
+
+            foreach ( var album in albums)
+            {
+                // add albums to dropdown
+                selectLIst.Add(new SelectListItem
+                {
+                    Value = album.Id.ToString(),
+                    Text = album.AlbumName.ToString()
+                });
+                
+            }
+            return selectLIst;
         }
     }
 
