@@ -1,0 +1,22 @@
+﻿@model PhotoApplication.Models.Album
+
+@{
+    ViewBag.Title = "New album";
+}
+
+@using (Html.BeginForm(actionName: "New", controllerName: "Album"))
+{
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.UserId)
+
+    @Html.Label("AlbumName", "Album name")
+    <br />
+    @Html.TextBox("AlbumName", null, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.AlbumName, "", new { @class = "text-danger" })
+    <br /><br />
+    
+    @Html.Hidden("Date", DateTime.Now, new { @class = "form-control" })
+
+    <button class="btn btn-sm btn-success" type="submit">Adauga articol</button>
+}

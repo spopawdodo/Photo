@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using PhotoApplication.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,11 +10,123 @@ namespace PhotoApplication.Controllers
 {
     public class PhotoController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Photo
+        private int _perPage = 12;
+
         public ActionResult Index()
         {
+            var photos = db.Photos.Include("Category").Include("Album").OrderBy(a => a.Date);
+            var totalItems = photos.Count();
+            var currentPage = Convert.ToInt32(Request.Params.Get("page"));
+
+            var offset = 0;
+
+            if (!currentPage.Equals(0)) { 
+                offset = (currentPage - 1) * this._perPage;
+            }
+
+            var paginatedPhotos = photos.Skip(offset).Take(this._perPage);
+
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.message = TempData["message"].ToString();
+            }
+
+            ViewBag.perPage = this._perPage;
+            ViewBag.total = totalItems;
+            ViewBag.lastPage = Math.Ceiling((float)totalItems / (float)this._perPage);
+            ViewBag.Articles = paginatedPhotos;
+
             return View();
         }
+
+
+        public ActionResult Show(int id)
+        {
+            Photo photo = db.Photos.Find(id);
+
+            ViewBag.displayButtons = false;
+            if (photo.UserId == User.Identity.GetUserId() || User.IsInRole("Administrator"))
+            {
+                ViewBag.displayButtons = true;
+            }
+
+            ViewBag.isAdmin = User.IsInRole("Administrator");
+            ViewBag.currentUser = User.Identity.GetUserId();
+
+
+            return View(photo);
+
+        }
+
+        [Authorize]
+        public ActionResult New()
+        {
+            Photo photo = new Photo();
+
+            photo.Categories = GetAllCategories();
+
+            // get the current users's id
+            photo.UserId = User.Identity.GetUserId();
+            
+            return View(photo);
+
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateInput(false)]
+        public ActionResult New(Photo photo)
+        {
+            photo.Categories = GetAllCategories();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Protect content from XSS
+                    article.Content = Sanitizer.GetSafeHtmlFragment(article.Content);
+                    db.Articles.Add(article);
+                    db.SaveChanges();
+                    TempData["message"] = "Articolul a fost adaugat!";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return View(article);
+                }
+            }
+            catch (Exception e)
+            {
+                return View(article);
+            }
+        }
+
+        [NonAction]
+        public IEnumerable<SelectListItem> GetAllCategories()
+        {
+            // generam o lista goala
+            var selectList = new List<SelectListItem>();
+
+            // Extragem toate categoriile din baza de date
+            var categories = from cat in db.Categories
+                             select cat;
+
+            // iteram prin categorii
+            foreach (var category in categories)
+            {
+                // Adaugam in lista elementele necesare pentru dropdown
+                selectList.Add(new SelectListItem
+                {
+                    Value = category.CategoryId.ToString(),
+                    Text = category.CategoryName.ToString()
+                });
+            }
+
+            // returnam lista de categorii
+            return selectList;
+        }
     }
+
+
 }

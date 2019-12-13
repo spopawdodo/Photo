@@ -4,11 +4,11 @@
     ViewBag.Title = "Show";
 }
 
-<h1>Model.AlbumName</h1>
+<h1>@Model.AlbumName</h1>
 
 
 <div class="panel panel-default">
-    @Html.Partial("ArticleInfo", Model)
+    @Html.Partial("AlbumInfo", Model)
 
     @if (Model.UserId == ViewBag.currentUser|| ViewBag.isAdmin)
     {
