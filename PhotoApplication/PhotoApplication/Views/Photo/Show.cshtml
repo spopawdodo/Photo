@@ -4,16 +4,17 @@
     ViewBag.Title = "Show";
 }
 
-@{
-    string imageBase64 = Convert.ToBase64String(Model.Image);
-    string imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
-}
-
 <h1>Show photo</h1>
 
 
 <div class="panel panel-default">
-    <img src="@imageSrc" alt="Model.Title" wight ="30%">
+
+    <asp:Image id="Image1" runat="server"
+               AlternateText="@Model.Image"
+               ImageAlign="left"
+               ImageUrl="@Model.Image" />
+
+    <img src="/Images/@Model.Image" alt="image" width="30%">
 
     @if (ViewBag.displayButtons == true && Model.UserId == ViewBag.currentUser
         || ViewBag.isAdmin)

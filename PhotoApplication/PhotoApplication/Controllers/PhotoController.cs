@@ -13,7 +13,6 @@ namespace PhotoApplication.Controllers
     public class PhotoController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
         private int _perPage = 12;
 
         public ActionResult Index()
@@ -47,16 +46,13 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Photo photo = db.Photos.Find(id);
-            WebImage image = new WebImage(photo.Image);
-            File(image.GetBytes(), "image/" + image.ImageFormat, image.FileName);
 
             ViewBag.displayButtons = false;
             if (photo.UserId == User.Identity.GetUserId() || User.IsInRole("Administrator"))
             {
                 ViewBag.displayButtons = true;
             }
-
-            ViewBag.image = image;
+            
             ViewBag.isAdmin = User.IsInRole("Administrator");
             ViewBag.currentUser = User.Identity.GetUserId();
 
@@ -88,7 +84,9 @@ namespace PhotoApplication.Controllers
             photo.Categories = GetAllCategories();
             photo.Albums = GetUserAlbums();
 
-            HttpPostedFile postedFile = Request.Files["ImageFile"];
+            HttpPostedFileBase postedFile = Request.Files["ImageFile"];
+            photo.Image = postedFile.FileName;
+            var imagePath = HttpContext.Server.MapPath("~/Images/") + postedFile.FileName;
 
             try
             {
@@ -96,10 +94,8 @@ namespace PhotoApplication.Controllers
                 {
                     if (photo.Image != null)
                     {
-                        //photo.Image.SaveAs(HttpContext.Server.MapPath("~/Images/") + file.FileName);
-                        //car.ImagePath = file.FileName;
+                        postedFile.SaveAs(imagePath);
                     }
-                    //photo.Image = imageToByte;
                     db.Photos.Add(photo);
                     db.SaveChanges();
                     TempData["message"] = "Photo was added";
