@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using PhotoApplication.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Helpers;
@@ -85,6 +86,15 @@ namespace PhotoApplication.Controllers
             photo.Albums = GetUserAlbums();
 
             HttpPostedFileBase postedFile = Request.Files["ImageFile"];
+
+            if (postedFile == null)
+            {
+                photo.Image = null;
+                return View(photo);
+            }
+
+            //TO DO
+            // Change image name so 2 users can add the same photo
             photo.Image = postedFile.FileName;
             var imagePath = HttpContext.Server.MapPath("~/Images/") + postedFile.FileName;
 
@@ -92,10 +102,7 @@ namespace PhotoApplication.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (photo.Image != null)
-                    {
-                        postedFile.SaveAs(imagePath);
-                    }
+                    postedFile.SaveAs(imagePath);
                     db.Photos.Add(photo);
                     db.SaveChanges();
                     TempData["message"] = "Photo was added";
@@ -110,6 +117,30 @@ namespace PhotoApplication.Controllers
             {
                 return View(photo);
             }
+        }
+
+        [HttpDelete]
+        [Authorize]
+        public ActionResult Delete(int id)
+        {
+            Photo photo = db.Photos.Find(id);
+            if (photo.UserId == User.Identity.GetUserId() ||
+                User.IsInRole("Administrator"))
+            {
+                // TO DO
+                // Remove photo from server
+           
+                db.Photos.Remove(photo);
+                db.SaveChanges();
+                TempData["message"] = "The photo was deleted";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["message"] = "You are not allowed to delete another user's photo";
+                return RedirectToAction("Index");
+            }
+
         }
 
         [NonAction]

@@ -7,14 +7,13 @@ using System.Web.Mvc;
 
 namespace PhotoApplication.Controllers
 {
-    [Authorize]
+    
     public class CategoryController : Controller
     {
         //private ApplicationDbContext db = new ApplicationDbContext();
         private ApplicationDbContext db = ApplicationDbContext.Create();
 
         // GET: Category
-        [Authorize(Roles = "User,Administrator")]
         public ActionResult Index()
         {
             if (TempData.ContainsKey("message"))
@@ -29,8 +28,8 @@ namespace PhotoApplication.Controllers
             return View();
 
         }
+        
 
-        [Authorize(Roles = "User,Administrator")]
         public ActionResult Show(int id)
         {
             Category category = db.Categories.Find(id);
