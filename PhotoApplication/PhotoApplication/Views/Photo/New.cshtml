@@ -20,11 +20,10 @@
 
     @Html.Label("ImageFile", "ImageFile")
     <br />
-    <input type="file" runat="server" id="MyImage" name="ImageFile" />
-    @Html.ValidationMessageFor(m => m.Image, "", new { @class = "text-danger" })
-
+    <input type="file" runat="server" id="MyImage" name="ImageFile" required/>
+    
     <br />
-    @Html.Hidden("Image", "ana", new { @class = "form-control" })
+    @Html.Hidden("Image", "not_null", new { @class = "form-control" })
     @Html.Hidden("Date", DateTime.Now, new { @class = "form-control" })
 
     <label>Pick a Category</label>

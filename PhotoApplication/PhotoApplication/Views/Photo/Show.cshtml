@@ -9,12 +9,7 @@
 
 <div class="panel panel-default">
 
-    <asp:Image id="Image1" runat="server"
-               AlternateText="@Model.Image"
-               ImageAlign="left"
-               ImageUrl="@Model.Image" />
-
-    <img src="/Images/@Model.Image" alt="image" width="30%">
+    @Html.Partial("PhotoInfo", Model)
 
     @if (ViewBag.displayButtons == true && Model.UserId == ViewBag.currentUser
         || ViewBag.isAdmin)

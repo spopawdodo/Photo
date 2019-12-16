@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Albums";
 }
 
@@ -11,6 +10,10 @@
 {
     <h3 class="alert alert-info" role="alert">@ViewBag.message</h3>
 }
+
+<div>
+    <a class="btn btn-sm btn-primary full-width" href="/Album/New">Show</a>
+</div>
 
 @foreach (PhotoApplication.Models.Album album in ViewBag.Albums)
 {

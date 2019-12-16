@@ -1,0 +1,20 @@
+﻿
+@model PhotoApplication.Models.Photo
+<div class="panel-heading article-heading">
+    <h3 class="font-roboto article-title">@Model.Title</h3>
+</div>
+<div class="article-meta">
+    <img src="/Images/@Model.Image" alt="image" width="30%">
+    <br /><br />
+    <div>
+        <p><strong>Category :</strong> @Model.Category.CategoryName </p>
+        <p><strong>Album : </strong>@Model.Album.AlbumName </p>
+        <i class="glyphicon glyphicon-user"></i>
+        <strong>Uploaded </strong> By Model.User.UserName
+        <p>
+            <i class="glyphicon glyphicon-calendar"></i>
+             Uploaded at @Model.Date
+        </p>
+    </div>
+</div>
+
