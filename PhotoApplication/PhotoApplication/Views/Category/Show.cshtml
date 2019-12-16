@@ -1,23 +1,40 @@
 ﻿@model PhotoApplication.Models.Category
 @{
-    ViewBag.Title = "Afisare categorie";
+    ViewBag.Title = Model.CategoryName;
 }
-
 <h2>@ViewBag.Title</h2>
 
-<p>@Model.CategoryName</p>
-
-@using (Html.BeginForm(actionName: "Delete", controllerName: "Category", routeValues: new { id = @Model.CategoryId }))
+@if (ViewBag.displayButtons == true && ViewBag.isAdmin)
 {
 
-    @Html.HttpMethodOverride(HttpVerbs.Delete)
+    <div class="panel-footer">
+        <a class="btn btn-primary" href="/Category/Edit/@Model.CategoryId">Edit category</a>
+        @if (ViewBag.displayButtons == true && ViewBag.isAdmin)
+        {
 
-    <button class="btn btn-success" type="submit">Sterge categoria</button>
+            using (Html.BeginForm(actionName: "Delete", controllerName: "Category", method: FormMethod.Post, routeValues: new { id = @Model.CategoryId }))
+            {
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button class="btn btn-danger" type="submit">Delete Category</button>
+            }
+        }
+    </div>
 }
 <br />
-<a class="btn btn-success" href="/Category/Index/">Afisare lista categorii</a>
 
+@foreach (PhotoApplication.Models.Photo photo in ViewBag.Photos)
+{
+    <div class="panel panel-article">
+        @Html.Partial("PhotoInfo", photo)
+        <div class="panel-footer article-panel-footer around">
+            <a class="btn btn-sm btn-success full-width" href="/Photo/Show/@photo.Id">Display Photo</a>
+        </div>
+    </div>
+    <br />
+}
+
+<a class="btn btn-success" href="/Category/Index/">Show all categories</a>
 <br />
 <hr />
 <br />
-

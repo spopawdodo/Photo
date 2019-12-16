@@ -18,7 +18,7 @@ namespace PhotoApplication.Controllers
 
         public ActionResult Index()
         {
-            var photos = db.Photos.Include("Category").Include("Album").OrderBy(a => a.Date);
+            var photos = db.Photos.Include("Category").Include("Album").OrderByDescending(a => a.Date);
             var totalItems = photos.Count();
             var currentPage = Convert.ToInt32(Request.Params.Get("page"));
 

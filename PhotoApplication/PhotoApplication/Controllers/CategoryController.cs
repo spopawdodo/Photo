@@ -33,6 +33,20 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Category category = db.Categories.Find(id);
+            var photos = from photo in db.Photos
+                         join album in db.Albums on photo.AlbumId equals album.Id
+                         where photo.CategoryId == id
+                         orderby photo.Date descending
+                         select photo;
+
+            ViewBag.displayButtons = false;
+            if (User.IsInRole("Administrator"))
+            {
+                ViewBag.displayButtons = true;
+            }
+
+            ViewBag.isAdmin = User.IsInRole("Administrator");
+            ViewBag.Photos = photos;
             return View(category);
         }
 
