@@ -9,7 +9,6 @@ using System.Web.Mvc;
 
 namespace PhotoApplication.Controllers
 {
-    [Authorize(Roles = "Administrator")]
     public class UsersController : Controller
     {
         private ApplicationDbContext db = ApplicationDbContext.Create();
@@ -25,42 +24,50 @@ namespace PhotoApplication.Controllers
             return View();
         }
 
-        [HttpGet]
+        public ActionResult Show(string id)
+        {
+            ApplicationUser user = db.Users.Find(id);
+            user.AllRoles = GetAllRoles();
+            ViewBag.utilizatorCurent = User.Identity.GetUserId();
+
+            ViewBag.DisplayEditButton = false;
+            if (User.Identity.GetUserId() == user.Id || User.IsInRole("Administrator"))
+            {
+                ViewBag.DisplayEditButton = true;
+            }
+
+            var roles = db.Roles.ToList();
+
+            var roleName = roles.Where(j => j.Id ==
+               user.Roles.FirstOrDefault().RoleId).
+               Select(a => a.Name).FirstOrDefault();
+
+            ViewBag.roleName = roleName;
+
+
+            return View(user);
+        }
+
+        [HttpGet][Authorize]
         public ActionResult Edit(string id)
         {
             ApplicationUser user = db.Users.Find(id);
             user.AllRoles = GetAllRoles();
             var roleName = user.Roles.FirstOrDefault();
 
-            //var roles = db.Roles.ToList();
-
-            //var roleName = roles.Where(j => j.Id == user.Roles.FirstOrDefault().RoleId).Select(a => a.Name).FirstOrDefault();
-
-            //ViewBag.userRole = roleName;
+            ViewBag.CanEditRole = false;
+            if (User.IsInRole("Administrator"))
+            {
+                ViewBag.CanEditRole = true;
+            }
+            
             ViewBag.userRole = roleName.RoleId;
             return View(user);
 
         }
 
-        [NonAction]
-        public IEnumerable<SelectListItem> GetAllRoles()
-        {
-            var selectList = new List<SelectListItem>();
 
-            var roles = from role in db.Roles select role;
-
-            foreach (var role in roles)
-            {
-                selectList.Add(new SelectListItem
-                {
-                    Value = role.Id.ToString(),
-                    Text = role.Name.ToString()
-                });
-            }
-            return selectList;
-        }
-
-        [HttpPut]
+        [HttpPut][Authorize]
         public ActionResult Edit(string id, ApplicationUser newData)
         {
             ApplicationUser user = db.Users.Find(id);
@@ -80,17 +87,20 @@ namespace PhotoApplication.Controllers
                     user.UserName = newData.UserName;
                     user.Email = newData.Email;
                     user.PhoneNumber = newData.PhoneNumber;
-
-                    var roles = from role in db.Roles select role;
-
-                    foreach (var role in roles)
+                    if (User.IsInRole("Administrator"))
                     {
-                        UserManager.RemoveFromRole(id, role.Name);
-                    }
+                        var roles = from role in db.Roles select role;
 
-                    var selectRole =
-                        db.Roles.Find(HttpContext.Request.Params.Get("newRole"));
-                    UserManager.AddToRole(id, selectRole.Name);
+                        foreach (var role in roles)
+                        {
+                            UserManager.RemoveFromRole(id, role.Name);
+                        }
+
+                        var selectRole =
+                            db.Roles.Find(HttpContext.Request.Params.Get("newRole"));
+                        UserManager.AddToRole(id, selectRole.Name);
+                    } 
+                   
                     db.SaveChanges();
                 }
                 return RedirectToAction("Index");
@@ -102,30 +112,38 @@ namespace PhotoApplication.Controllers
                 return View(user);
             }
         }
+        
 
-
-        public ActionResult Show(string id)
-        {
-
-            ApplicationUser user = db.Users.Find(id);
-            user.AllRoles = GetAllRoles();
-            ViewBag.utilizatorCurent = User.Identity.GetUserId();
-
-            var roles = db.Roles.ToList();
-
-            var roleName = roles.Where(j => j.Id == user.Roles.FirstOrDefault().RoleId).Select(a => a.Name).FirstOrDefault();
-
-            ViewBag.userRole = roleName;
-            return View(user);
-        }
-
-        [HttpDelete]
+        [HttpDelete][Authorize]
         public ActionResult Delete(string id)
         {
             ApplicationUser user = db.Users.Find(id);
-            db.Users.Remove(user);
-            db.SaveChanges();
+            if (User.Identity.GetUserId() == id || User.IsInRole("Administrator"))
+            {
+                db.Users.Remove(user);
+                db.SaveChanges();
+            }
             return RedirectToAction("Index");
+
+        }
+
+
+        [NonAction]
+        public IEnumerable<SelectListItem> GetAllRoles()
+        {
+            var selectList = new List<SelectListItem>();
+
+            var roles = from role in db.Roles select role;
+
+            foreach (var role in roles)
+            {
+                selectList.Add(new SelectListItem
+                {
+                    Value = role.Id.ToString(),
+                    Text = role.Name.ToString()
+                });
+            }
+            return selectList;
         }
 
     }
