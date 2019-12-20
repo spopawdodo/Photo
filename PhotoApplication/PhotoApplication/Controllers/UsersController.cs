@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace PhotoApplication.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private ApplicationDbContext db = ApplicationDbContext.Create();
@@ -48,7 +49,7 @@ namespace PhotoApplication.Controllers
             return View(user);
         }
 
-        [HttpGet][Authorize]
+        [HttpGet]
         public ActionResult Edit(string id)
         {
             ApplicationUser user = db.Users.Find(id);
@@ -67,7 +68,7 @@ namespace PhotoApplication.Controllers
         }
 
 
-        [HttpPut][Authorize]
+        [HttpPut]
         public ActionResult Edit(string id, ApplicationUser newData)
         {
             ApplicationUser user = db.Users.Find(id);
@@ -114,7 +115,7 @@ namespace PhotoApplication.Controllers
         }
         
 
-        [HttpDelete][Authorize]
+        [HttpDelete]
         public ActionResult Delete(string id)
         {
             ApplicationUser user = db.Users.Find(id);

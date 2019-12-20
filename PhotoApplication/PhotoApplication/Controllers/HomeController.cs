@@ -19,7 +19,7 @@ namespace PhotoApplication.Controllers
                 return RedirectToAction("Index", "Photo");
             }
 
-            var photos = db.Photos.Include("Category").Include("Album").OrderByDescending(a => a.Date);
+            var photos = db.Photos.Include("Category").Include("Album").Include("User").OrderByDescending(a => a.Date);
             var totalItems = photos.Count();
             var currentPage = Convert.ToInt32(Request.Params.Get("page"));
 
@@ -44,20 +44,5 @@ namespace PhotoApplication.Controllers
 
             return View();
         }
-        /*
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-        */
     }
 }

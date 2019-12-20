@@ -19,7 +19,8 @@ namespace PhotoApplication.Controllers
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.message = TempData["message"].ToString();
-            } 
+            }
+
 
             var categories = from category in db.Categories
                              orderby category.CategoryName
@@ -33,11 +34,7 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Category category = db.Categories.Find(id);
-            var photos = from photo in db.Photos
-                         join album in db.Albums on photo.AlbumId equals album.Id
-                         where photo.CategoryId == id
-                         orderby photo.Date descending
-                         select photo;
+            var photos = db.Photos.Include("Category").Include("Album").Include("User").OrderByDescending(a => a.Date);
 
             ViewBag.displayButtons = false;
             if (User.IsInRole("Administrator"))

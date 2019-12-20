@@ -48,7 +48,6 @@ namespace PhotoApplication.Controllers
         {
             Album album = db.Albums.Find(id);
             var photos = from photo in db.Photos
-                         join cat in db.Categories on photo.CategoryId equals cat.CategoryId
                          where photo.AlbumId == id 
                          orderby photo.Date descending
                          select photo;
