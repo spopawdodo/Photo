@@ -1,9 +1,7 @@
 ﻿@model PhotoApplication.Models.ApplicationUser
 
 @{
-    /**/
-
-    ViewBag.Title = "Editare rol utilizator";
+    ViewBag.Title = "Edit user profile";
 }
 
 <ol class="breadcrumb">
@@ -19,7 +17,7 @@
     <br />
 
     <i class="glyphicon glyphicon-user"></i>
-    @Html.Label("UserName", "Nume utilizator", new { @class = "" })
+    @Html.Label("UserName", "User Name", new { @class = "" })
 
     <br />
 
@@ -28,7 +26,7 @@
     <br /><br />
 
     <i class="glyphicon glyphicon-envelope"></i>
-    @Html.Label("Email", "Email utilizator", new { @class = "" })
+    @Html.Label("Email", "Email", new { @class = "" })
 
     <br />
 
@@ -37,7 +35,7 @@
     <br /><br />
 
     <i class="glyphicon glyphicon-phone"></i>
-    @Html.Label("PhoneNumber", "Numar telefon")
+    @Html.Label("PhoneNumber", "Phone Number")
 
     <br />
 
@@ -47,12 +45,12 @@
     if (ViewBag.CanEditRole == true)
     {
         <i class="glyphicon glyphicon-th-list"></i>
-        <label>Selectati rolul</label>
+        <label>Pick Role</label>
         @Html.DropDownList("newRole", new SelectList(Model.AllRoles, "Value", "Text", ViewBag.userRole), null, new { @class = "form-control" })
         <br />
     }
     
-    <button class="btn btn-sm btn-success" type="submit">Modifica datele utilizatorului</button>
+    <button class="btn btn-sm btn-success" type="submit">Edit user data</button>
     
 }
 

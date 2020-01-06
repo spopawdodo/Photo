@@ -62,7 +62,7 @@ namespace PhotoApplication.Controllers
                 db.Categories.Add(cat);
                 db.SaveChanges();
                 //
-                TempData["message"] = "Categoria a fost adaugata!";
+                TempData["message"] = "The category was added";
                 //
                 return RedirectToAction("Index");
             }
@@ -91,9 +91,7 @@ namespace PhotoApplication.Controllers
                 if (TryUpdateModel(category))
                 {
                     category.CategoryName = requestCategory.CategoryName;
-                    //
-                    TempData["message"] = "Categoria a fost modificata!";
-                    //
+                    TempData["message"] = "The category was modified";                   
                     db.SaveChanges();
                 }
 
@@ -110,10 +108,13 @@ namespace PhotoApplication.Controllers
         public ActionResult Delete(int id)
         {
             Category category = db.Categories.Find(id);
+            var photos = db.Photos.Where(p => p.CategoryId == id);
+            foreach (Photo photo in photos)
+            {
+                db.Photos.Remove(photo);
+            }
             db.Categories.Remove(category);
-            //
-            TempData["message"] = "Categoria a fost stearsa!";
-            //
+            TempData["message"] = "The category was deleted";
             db.SaveChanges();
             return RedirectToAction("Index");
         }

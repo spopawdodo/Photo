@@ -48,11 +48,7 @@ namespace PhotoApplication.Controllers
         {
             Album album = db.Albums.Find(id);
             var photos = db.Photos.Include("User").Include("Album").Include("Category").Where(p => p.AlbumId == id).OrderByDescending(p => p.Date);
-            /*var photos = from photo in db.Photos
-                         where photo.AlbumId == id 
-                         orderby photo.Date descending
-                         select photo;
-           */
+           
             ViewBag.isAdmin = User.IsInRole("Administrator");
             ViewBag.currentUser = User.Identity.GetUserId();
             ViewBag.Photos = photos;
@@ -170,9 +166,13 @@ namespace PhotoApplication.Controllers
             if (album.UserId == User.Identity.GetUserId() ||
                 User.IsInRole("Administrator"))
             {
-                db.Albums.Remove(album);
-                // TO DO
-                // delete all pictures from album 
+                var photos = db.Photos.Where(p => p.AlbumId == id);
+                foreach (Photo photo in photos)
+                {
+                    db.Photos.Remove(photo);
+                }
+                
+                db.Albums.Remove(album); 
                 db.SaveChanges();
                 TempData["message"] = "The album was deleted";
                 return RedirectToAction("Index");

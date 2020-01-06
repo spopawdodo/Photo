@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace PhotoApplication.Controllers
 {
@@ -119,11 +120,34 @@ namespace PhotoApplication.Controllers
         public ActionResult Delete(string id)
         {
             ApplicationUser user = db.Users.Find(id);
+            bool is_admin = User.IsInRole("Administrator");
             if (User.Identity.GetUserId() == id || User.IsInRole("Administrator"))
             {
+                var albums = db.Albums.Where(p => p.UserId == id).ToList();
+                foreach (Album album in albums)
+                {
+                    int id_album = album.Id;
+                    var photos = db.Photos.Where(p => p.AlbumId == id_album);
+                    foreach (Photo photo in photos)
+                    {
+                        db.Photos.Remove(photo);
+                    }
+                }
+
+                foreach (Album album in albums)
+                {
+                    db.Albums.Remove(album);
+                }
+                
                 db.Users.Remove(user);
                 db.SaveChanges();
             }
+
+            if (!is_admin)
+            {
+                FormsAuthentication.SignOut();
+            }
+            
             return RedirectToAction("Index");
 
         }
