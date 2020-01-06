@@ -34,7 +34,7 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Category category = db.Categories.Find(id);
-            var photos = db.Photos.Include("Category").Include("Album").Include("User").OrderByDescending(a => a.Date);
+            var photos = db.Photos.Include("Category").Include("Album").Include("User").Where(p => p.CategoryId == id).OrderByDescending(p => p.Date);
 
             ViewBag.displayButtons = false;
             if (User.IsInRole("Administrator"))

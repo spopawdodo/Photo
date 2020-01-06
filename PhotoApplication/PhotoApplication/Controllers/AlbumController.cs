@@ -47,11 +47,12 @@ namespace PhotoApplication.Controllers
         public ActionResult Show(int id)
         {
             Album album = db.Albums.Find(id);
-            var photos = from photo in db.Photos
+            var photos = db.Photos.Include("User").Include("Album").Include("Category").Where(p => p.AlbumId == id).OrderByDescending(p => p.Date);
+            /*var photos = from photo in db.Photos
                          where photo.AlbumId == id 
                          orderby photo.Date descending
                          select photo;
-
+           */
             ViewBag.isAdmin = User.IsInRole("Administrator");
             ViewBag.currentUser = User.Identity.GetUserId();
             ViewBag.Photos = photos;
